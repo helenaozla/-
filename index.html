@@ -1,0 +1,130 @@
+html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國際貿易丙檢檢定練習</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f5f7fa; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #1a202c; font-size: 24px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #718096; margin-bottom: 25px; font-size: 14px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; overflow-x: auto; }
+        .tab-btn { background: #edf2f7; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; color: #4a5568; white-space: nowrap; }
+        .tab-btn.active { background: #3182ce; color: #fff; }
+        .quiz-item { background: #ffffff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .question { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 12px; line-height: 1.5; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn { background: #fff; border: 1px solid #cbd5e0; padding: 12px 15px; border-radius: 6px; text-align: left; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+        .option-btn:hover { background: #f7fafc; border-color: #a0aec0; }
+        .option-btn.correct { background-color: #c6f6d5 !important; border-color: #48bb78 !important; color: #22543d; font-weight: bold; }
+        .option-btn.incorrect { background-color: #fed7d7 !important; border-color: #f56565 !important; color: #742a2a; }
+        .analysis { margin-top: 15px; padding: 12px 15px; border-radius: 6px; display: none; font-size: 14px; line-height: 1.5; border-left: 4px solid; }
+        .analysis.show-correct { display: block; background-color: #f0fff4; border-color: #38a169; color: #276749; }
+        .analysis.show-incorrect { display: block; background-color: #fff5f5; border-color: #e53e3e; color: #9b2c2c; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="quiz-title">國際貿易丙檢 互動練習題庫</h1>
+    <div class="subtitle">請選擇下方學科工作項目分頁開始進行刷題</div>
+    
+    <!-- 分頁標籤區 -->
+    <div class="tabs" id="tabs-container"></div>
+    
+    <!-- 題目顯示區 -->
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+// ==================== 你的 Excel 題庫放置處 ====================
+// 請複製我稍後產生的程式碼，完整替換掉下面這一塊
+const quizDatabase = {
+    "工作項目01": [
+        { q: "這是範例題目：國際貿易中，CIF 條件是指？", o: ["運保費在內條件", "運費在內條件", "工廠交貨條件"], c: 0, r: "CIF 包含 Cost, Insurance and Freight，即運費保險費在內。" }
+    ],
+    "工作項目02": [],
+    "工作項目03": [],
+    "工作項目04": [],
+    "工作項目05": []
+};
+// =============================================================
+
+function renderTabs() {
+    const tabsContainer = document.getElementById('tabs-container');
+    tabsContainer.innerHTML = '';
+    Object.keys(quizDatabase).forEach((tabName, index) => {
+        const btn = document.createElement('button');
+        btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+        btn.innerText = tabName;
+        btn.onclick = () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderQuestions(tabName);
+        };
+        tabsContainer.appendChild(btn);
+    });
+}
+
+function renderQuestions(tabName) {
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = '';
+    const questions = quizDatabase[tabName];
+    
+    if (!questions || questions.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color:#a0aec0; padding:20px;">這個分頁目前還沒有題目喔！請將 Excel 資料貼入。</div>';
+        return;
+    }
+
+    questions.forEach((item, qIdx) => {
+        const quizItem = document.createElement('div');
+        quizItem.className = 'quiz-item';
+
+        const qDiv = document.createElement('div');
+        qDiv.className = 'question';
+        qDiv.innerText = `${qIdx + 1}. ${item.q}`;
+        quizItem.appendChild(qDiv);
+
+        const optsDiv = document.createElement('div');
+        optsDiv.className = 'options';
+
+        const ansDiv = document.createElement('div');
+        ansDiv.className = 'analysis';
+
+        item.o.forEach((opt, oIdx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                optsDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                optsDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('correct', 'incorrect'));
+                if (oIdx === item.c) {
+                    btn.classList.add('correct');
+                    ansDiv.className = 'analysis show-correct';
+                    ansDiv.innerText = `💡 解析：${item.r || '回答正確！'}`;
+                } else {
+                    btn.classList.add('incorrect');
+                    ansDiv.className = 'analysis show-incorrect';
+                    ansDiv.innerText = `❌ 答錯囉！再想想看。`;
+                }
+            };
+            optsDiv.appendChild(btn);
+        });
+
+        quizItem.appendChild(optsDiv);
+        quizItem.appendChild(ansDiv);
+        container.appendChild(quizItem);
+    });
+}
+
+// 初始化
+renderTabs();
+if(Object.keys(quizDatabase).length > 0) {
+    renderQuestions(Object.keys(quizDatabase)[0]);
+}
+</script>
+
+</body>
+</html>
