@@ -30,16 +30,11 @@ html
 <div class="container">
     <h1 id="quiz-title">國際貿易丙檢 互動練習題庫</h1>
     <div class="subtitle">請選擇下方學科工作項目分頁開始進行刷題</div>
-    
-    <!-- 分頁標籤區 -->
     <div class="tabs" id="tabs-container"></div>
-    
-    <!-- 題目顯示區 -->
     <div id="quiz-container"></div>
 </div>
 
 <script>
-// ==================== 你的 Excel 題庫放置處 ====================
 const quizDatabase = {
     "第一章": [
         { q: "產品購回協定中，購買機械設備的一方大多為?", o: ["(1)開發中國家", "(2)已開發國家", "(3)外匯充裕國家", "(4)外匯短缺國家。"], c: 0 },
@@ -325,8 +320,7 @@ const quizDatabase = {
         { q: "在國際貿易中，多數大宗散裝貨物交貨採用", o: ["(1)散裝貨物", "(2)整櫃貨物", "(3)貨櫃交貨", "(4)散裝交貨。"], c: 0 }
     ]
 };
-// =============================================================
-
+    
 function renderTabs() {
     const tabsContainer = document.getElementById('tabs-container');
     tabsContainer.innerHTML = '';
@@ -349,7 +343,7 @@ function renderQuestions(tabName) {
     const questions = quizDatabase[tabName];
     
     if (!questions || questions.length === 0) {
-        container.innerHTML = '<div style="text-align:center; color:#a0aec0; padding:20px;">這個分頁目前還沒有題目喔！請將 Excel 資料貼入。</div>';
+        container.innerHTML = '<div style="text-align:center; color:#a0aec0; padding:20px;">這個分頁目前還沒有題目喔！</div>';
         return;
     }
 
@@ -373,12 +367,11 @@ function renderQuestions(tabName) {
             btn.className = 'option-btn';
             btn.innerText = opt;
             btn.onclick = () => {
-                optsDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
                 optsDiv.querySelectorAll('.option-btn').forEach(b => b.classList.remove('correct', 'incorrect'));
                 if (oIdx === item.c) {
                     btn.classList.add('correct');
                     ansDiv.className = 'analysis show-correct';
-                    ansDiv.innerText = `💡 解析：${item.r || '回答正確！'}`;
+                    ansDiv.innerText = `💡 解析：回答正確！`;
                 } else {
                     btn.classList.add('incorrect');
                     ansDiv.className = 'analysis show-incorrect';
@@ -396,8 +389,9 @@ function renderQuestions(tabName) {
 
 // 初始化
 renderTabs();
-if(Object.keys(quizDatabase).length > 0) {
-    renderQuestions(Object.keys(quizDatabase)[0]);
+const firstTab = Object.keys(quizDatabase)[0];
+if (firstTab) {
+    renderQuestions(firstTab);
 }
 </script>
 
